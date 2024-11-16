@@ -174,8 +174,22 @@ def tensor_map(
         in_index = cuda.local.array(MAX_DIMS, numba.int32)
         i = cuda.blockIdx.x * cuda.blockDim.x + cuda.threadIdx.x
         # TODO: Implement for Task 3.3.
-        raise NotImplementedError("Need to implement for Task 3.3")
 
+        # Check if the thread index is within bounds
+        if i >= out_size:
+            return
+        # Fast path: no broadcasting needed
+        if in_strides == out_strides and in_shape == out_shape:
+            out[i] = fn(in_storage[i])
+            return
+        
+        to_index(i, out_shape, out_index)
+        broadcast_index(out_index, out_shape, in_shape, in_index)
+        o = index_to_position(out_index, out_strides)
+        j = index_to_position(in_index, in_strides)
+        out[o] = fn(in_storage[j])
+        # raise NotImplementedError("Need to implement for Task 3.3")
+            
     return cuda.jit()(_map)  # type: ignore
 
 

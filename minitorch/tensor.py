@@ -10,6 +10,7 @@ import numpy as np
 from . import operators
 from .autodiff import Context, Variable, backpropagate
 from .tensor_data import TensorData
+from .tensor_functions import tensor
 
 # Comment these out if not yet implemented
 from .tensor_functions import (
@@ -339,11 +340,11 @@ class Tensor:
         """Compute reduce multiplication"""
         if dim is None:
             return All.apply(
-                self.contiguous().view(int(operators.prod(self.shape))),
+                self.view(self.size),
                 self._ensure_tensor(0),
             )
         else:
-            return All.apply(self, Tensor.make([dim], (1,), backend=self.backend))
+            return All.apply(self, self._ensure_tensor(dim))
 
     def is_close(self, b: Tensor) -> Tensor:
         """Check if two tensors are close"""
@@ -370,7 +371,7 @@ class Tensor:
         """Compute reduce sum"""
         if dim is None:
             return Sum.apply(
-                self.contiguous().view(int(operators.prod(self.shape))),
+                self.contiguous().view(self.size),
                 self._ensure_tensor(0),
             )
         else:
@@ -379,25 +380,25 @@ class Tensor:
     def mean(self, dim: Optional[int] = None) -> Tensor:
         """Compute the mean over dimension `dim`."""
         if dim is None:
-            return self.sum(dim) / self.size
+            return self.sum() / self.size
         else:
             return self.sum(dim) / self.shape[dim]
 
     def permute(self, *order: int) -> Tensor:
         """Permute the dimensions of a tensor."""
-        orders_list = [float(dim) for dim in order]
-        shape = (len(orders_list),)
-        orders_tensor = Tensor.make(orders_list, shape, backend=self.backend)
-        return Permute.apply(self, orders_tensor)
-        # return Permute.apply(self, tensor(list(order)))
+        # orders_list = [float(dim) for dim in order]
+        # shape = (len(orders_list),)
+        # orders_tensor = Tensor.make(orders_list, shape, backend=self.backend)
+        # return Permute.apply(self, orders_tensor)
+        return Permute.apply(self, tensor(list(order)))
 
     def view(self, *shape: int) -> Tensor:
         """Reshape the tensor"""
-        shape_list = [float(dim) for dim in shape]
-        shape = (len(shape_list),)
-        orders_tensor = Tensor.make(shape_list, shape, backend=self.backend)
-        return View.apply(self, orders_tensor)
-        # return View.apply(self, tensor(list(shape)))
+        # shape_list = [float(dim) for dim in shape]
+        # shape = (len(shape_list),)
+        # orders_tensor = Tensor.make(shape_list, shape, backend=self.backend)
+        # return View.apply(self, orders_tensor)
+        return View.apply(self, tensor(list(shape)))
 
     # set .grad
     def zero_grad_(self) -> None:

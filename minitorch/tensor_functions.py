@@ -135,8 +135,8 @@ class Mul(Function):
         """Multiply backward"""
         t1, t2 = ctx.saved_values
         return (
-            grad_output.f.mul_zip(grad_output, t2), 
-            grad_output.f.mul_zip(grad_output, t1)
+            grad_output.f.mul_zip(t2, grad_output), 
+            grad_output.f.mul_zip(t1, grad_output)
         )
 
 
