@@ -178,15 +178,15 @@ def tensor_map(
         # Check if the thread index is within bounds
         if i < out_size:
             # Fast path: no broadcasting needed
-            if in_shape == out_shape and in_strides == out_strides:
-                out[i] = fn(in_storage[i])
+            # if in_shape == out_shape and in_strides == out_strides:
+            #     out[i] = fn(in_storage[i])
 
-            else:           
-                to_index(i, out_shape, out_index)
-                broadcast_index(out_index, out_shape, in_shape, in_index)
-                o = index_to_position(out_index, out_strides)
-                j = index_to_position(in_index, in_strides)
-                out[o] = fn(in_storage[j])
+            # else:           
+            to_index(i, out_shape, out_index)
+            broadcast_index(out_index, out_shape, in_shape, in_index)
+            o = index_to_position(out_index, out_strides)
+            j = index_to_position(in_index, in_strides)
+            out[o] = fn(in_storage[j])
         # raise NotImplementedError("Need to implement for Task 3.3")
             
     return cuda.jit()(_map)  # type: ignore
@@ -232,19 +232,19 @@ def tensor_zip(
         # TODO: Implement for Task 3.3.
         if i < out_size:
 
-            if (
-                out_strides == a_strides and out_strides == b_strides and 
-                out_shape == a_shape and out_shape == b_shape
-                ):
-                out[i] = fn(a_storage[i], b_storage[i])
-            else:
-                to_index(i, out_shape, out_index)
-                o = index_to_position(out_index, out_strides)
-                broadcast_index(out_index, out_shape, a_shape, a_index)
-                j = index_to_position(a_index, a_strides)
-                broadcast_index(out_index, out_shape, b_shape, b_index)
-                k = index_to_position(b_index, b_strides)
-                out[o] = fn(a_storage[j], b_storage[k])
+            # if (
+            #     out_strides == a_strides and out_strides == b_strides and 
+            #     out_shape == a_shape and out_shape == b_shape
+            #     ):
+            #     out[i] = fn(a_storage[i], b_storage[i])
+            # else:
+            to_index(i, out_shape, out_index)
+            o = index_to_position(out_index, out_strides)
+            broadcast_index(out_index, out_shape, a_shape, a_index)
+            j = index_to_position(a_index, a_strides)
+            broadcast_index(out_index, out_shape, b_shape, b_index)
+            k = index_to_position(b_index, b_strides)
+            out[o] = fn(a_storage[j], b_storage[k])
         # raise NotImplementedError("Need to implement for Task 3.3")
 
     return cuda.jit()(_zip)  # type: ignore
@@ -283,10 +283,7 @@ def _sum_practice(out: Storage, a: Storage, size: int) -> None:
 
     # TODO: Implement for Task 3.3.
     # Load data into shared memory
-    if i < size:
-        cache[pos] = a[i]
-    else:
-        cache[pos] = 0.0
+    cache[pos] = a[i] if i < size else 0.0
     cuda.syncthreads()
 
     # Perform reduction using half-thread logic
@@ -295,9 +292,11 @@ def _sum_practice(out: Storage, a: Storage, size: int) -> None:
         if pos < stride:
             cache[pos] += cache[pos + stride]
         cuda.syncthreads()
-        stride //= 2  # Halve the number of active threads
+        stride //= 2
 
-    out[cuda.blockIdx.x] = cache[0]
+    # Write the result to the output array
+    if pos == 0:
+        out[cuda.blockIdx.x] = cache[0]
     # raise NotImplementedError("Need to implement for Task 3.3")
 
 
