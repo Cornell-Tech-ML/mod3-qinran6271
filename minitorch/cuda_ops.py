@@ -178,7 +178,7 @@ def tensor_map(
         # Check if the thread index is within bounds
         if i < out_size:
             # Fast path: no broadcasting needed
-            if cuda.local.array_equal(in_shape, out_shape) and cuda.local.array_equal(in_strides, out_strides):
+            if in_shape == out_shape and in_strides == out_strides:
                 out[i] = fn(in_storage[i])
 
             else:           
@@ -233,8 +233,8 @@ def tensor_zip(
         if i < out_size:
 
             if (
-                cuda.local.array_equal(out_strides, a_strides) and cuda.local.array_equal(out_strides, b_strides) and 
-                cuda.local.array_equal(out_shape, a_shape) and cuda.local.array_equal(out_shape, b_shape)
+                out_strides == a_strides and out_strides == b_strides and 
+                out_shape == a_shape and out_shape == b_shape
                 ):
                 out[i] = fn(a_storage[i], b_storage[i])
             else:
