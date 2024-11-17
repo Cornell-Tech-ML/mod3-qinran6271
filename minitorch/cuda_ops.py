@@ -176,12 +176,7 @@ def tensor_map(
         # TODO: Implement for Task 3.3.
 
         # Check if the thread index is within bounds
-        if i < out_size:
-            # Fast path: no broadcasting needed
-            # if in_shape == out_shape and in_strides == out_strides:
-            #     out[i] = fn(in_storage[i])
-
-            # else:           
+        if i < out_size:        
             to_index(i, out_shape, out_index)
             broadcast_index(out_index, out_shape, in_shape, in_index)
             o = index_to_position(out_index, out_strides)
@@ -231,13 +226,6 @@ def tensor_zip(
 
         # TODO: Implement for Task 3.3.
         if i < out_size:
-
-            # if (
-            #     out_strides == a_strides and out_strides == b_strides and 
-            #     out_shape == a_shape and out_shape == b_shape
-            #     ):
-            #     out[i] = fn(a_storage[i], b_storage[i])
-            # else:
             to_index(i, out_shape, out_index)
             o = index_to_position(out_index, out_strides)
             broadcast_index(out_index, out_shape, a_shape, a_index)
@@ -349,7 +337,35 @@ def tensor_reduce(
         pos = cuda.threadIdx.x
 
         # TODO: Implement for Task 3.3.
-    
+        global_idx = out_pos * BLOCK_DIM + pos
+
+
+        if global_idx < len(a_storage):
+            to_index(global_idx, a_shape, out_index)
+            o = index_to_position(out_index, out_strides)
+
+           
+            reduce_start = index_to_position(out_index, a_strides)
+            cache[pos] = a_storage[reduce_start]
+
+            step = a_strides[reduce_dim]
+            for _ in range(1, a_shape[reduce_dim]): 
+                reduce_start += step
+                cache[pos] = fn(cache[pos], a_storage[reduce_start])
+        else:
+            cache[pos] = 0.0
+
+        cuda.syncthreads()
+
+        stride = BLOCK_DIM // 2
+        while stride > 0:
+            if pos < stride:
+                cache[pos] = fn(cache[pos], cache[pos + stride])
+            cuda.syncthreads() 
+            stride //= 2
+
+        if pos == 0:
+            out[out_pos] = cache[0]
         # raise NotImplementedError("Need to implement for Task 3.3")
 
     return jit(_reduce)  # type: ignore
