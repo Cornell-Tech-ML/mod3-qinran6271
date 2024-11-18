@@ -463,7 +463,7 @@ def _tensor_matrix_multiply(
     # Batch dimension - fixed
     batch = cuda.blockIdx.z
 
-    BLOCK_DIM = 32
+    BLOCK_DIM = 32 # 一个block中的线程数
     a_shared = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
     b_shared = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
 
@@ -487,16 +487,16 @@ def _tensor_matrix_multiply(
     out_value = 0.0
     
     # Iterate over all tiles
-    for tile in range((a_shape[-1] + BLOCK_DIM - 1) // BLOCK_DIM):
+    for block_i in range((a_shape[-1] + BLOCK_DIM - 1) // BLOCK_DIM):
         # Load a tile of matrix A into shared memory
-        if i < a_shape[-2] and (tile * BLOCK_DIM + pj) < a_shape[-1]:
-            a_shared[pi, pj] = a_storage[batch * a_batch_stride + i * a_strides[1] + (tile * BLOCK_DIM + pj)]
+        if i < a_shape[-2] and (block_i * BLOCK_DIM + pj) < a_shape[-1]:
+            a_shared[pi, pj] = a_storage[batch * a_batch_stride + i * a_strides[-2] + (block_i * BLOCK_DIM + pj) * a_strides[-1] ]
         else:
             a_shared[pi, pj] = 0.0
 
         # Load a tile of matrix B into shared memory
-        if j < b_shape[-1] and (tile * BLOCK_DIM + pi) < b_shape[-2]:
-            b_shared[pi, pj] = b_storage[batch * b_batch_stride + (tile * BLOCK_DIM + pi) * b_strides[1] + j]
+        if j < b_shape[-1] and (block_i * BLOCK_DIM + pi) < b_shape[-2]:
+            b_shared[pi, pj] = b_storage[batch * b_batch_stride + (block_i * BLOCK_DIM + pi) * b_strides[-2] + j * b_strides[-1]]
         else:
             b_shared[pi, pj] = 0.0
 
@@ -512,7 +512,7 @@ def _tensor_matrix_multiply(
 
     # Write the result to global memory
     if i < out_shape[-2] and j < out_shape[-1]:
-        out[batch * out_strides[0] + i * out_strides[1] + j] = out_value
+        out[batch * out_strides[0] + i * out_strides[-2] + j * out_strides[-1]] = out_value
     # raise NotImplementedError("Need to implement for Task 3.4")
 
 
