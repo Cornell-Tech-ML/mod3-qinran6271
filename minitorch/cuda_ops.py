@@ -347,7 +347,7 @@ def tensor_reduce(
         else:
             cache[pos] = reduce_value
         cuda.syncthreads()
-        
+
         stride = BLOCK_DIM // 2
         while stride > 0:
             if pos < stride:
@@ -363,7 +363,7 @@ def tensor_reduce(
 
 
 def _mm_practice(out: Storage, a: Storage, b: Storage, size: int) -> None:
-    """This is a practice square MM kernel to prepare for matmul.
+    """Practice square MM kernel to prepare for matmul.
 
     Given a storage `out` and two storage `a` and `b`. Where we know
     both are shape [size, size] with strides [size, 1].
@@ -395,7 +395,22 @@ def _mm_practice(out: Storage, a: Storage, b: Storage, size: int) -> None:
     """
     BLOCK_DIM = 32
     # TODO: Implement for Task 3.3.
-    raise NotImplementedError("Need to implement for Task 3.3")
+    shared = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
+    i = cuda.blockIdx.x * cuda.blockDim.x + cuda.threadIdx.x
+    j = cuda.blockIdx.y * cuda.blockDim.y + cuda.threadIdx.y
+    if i < size and j < size:
+        shared[i] = a[i * size + j] * b[i * size + j]
+    else:
+        shared[i] = 0.0
+    cuda.syncthreads()
+
+    if i < size and j < size:
+        temp = 0
+        for k in range(size):
+            temp += shared[k]
+        out[i * size + j] = temp
+    
+    # raise NotImplementedError("Need to implement for Task 3.3")
 
 
 jit_mm_practice = jit(_mm_practice)
