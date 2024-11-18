@@ -489,14 +489,14 @@ def _tensor_matrix_multiply(
     # Iterate over all tiles
     for block_i in range((a_shape[-1] + BLOCK_DIM - 1) // BLOCK_DIM):
         # Load a tile of matrix A into shared memory
-        if i + pi < a_shape[-2] and (block_i * BLOCK_DIM + pj) < a_shape[-1]:
-            a_shared[pi, pj] = a_storage[batch * a_batch_stride + (i + pi) * a_strides[-2] + (block_i * BLOCK_DIM + pj) * a_strides[-1] ]
+        if i < a_shape[-2] and (block_i * BLOCK_DIM + pj) < a_shape[-1]:
+            a_shared[pi, pj] = a_storage[batch * a_batch_stride + i * a_strides[1] + (block_i * BLOCK_DIM + pj) * a_strides[2] ]
         else:
             a_shared[pi, pj] = 0.0
 
         # Load a tile of matrix B into shared memory
-        if (j + pj) < b_shape[-1] and (block_i * BLOCK_DIM + pi) < b_shape[-2]:
-            b_shared[pi, pj] = b_storage[batch * b_batch_stride + (block_i * BLOCK_DIM + pi) * b_strides[-2] + (j + pj) * b_strides[-1]]
+        if j < b_shape[-1] and (block_i * BLOCK_DIM + pi) < b_shape[-2]:
+            b_shared[pi, pj] = b_storage[batch * b_batch_stride + (block_i * BLOCK_DIM + pi) * b_strides[1] + j * b_strides[2]]
         else:
             b_shared[pi, pj] = 0.0
 
@@ -511,8 +511,8 @@ def _tensor_matrix_multiply(
         cuda.syncthreads()
 
     # Write the result to global memory
-    if (i + pi) < out_shape[-2] and (j + pj) < out_shape[-1]:
-        out[batch * out_strides[0] + i * out_strides[-2] + j * out_strides[-1]] = out_value
+    if i < out_shape[-2] and j < out_shape[-1]:
+        out[batch * out_strides[0] + i * out_strides[1] + j * out_strides[2]] = out_value
     # raise NotImplementedError("Need to implement for Task 3.4")
 
 
