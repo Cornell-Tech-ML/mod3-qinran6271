@@ -412,6 +412,7 @@ def _mm_practice(out: Storage, a: Storage, b: Storage, size: int) -> None:
         temp = 0
         for k in range(size):
             temp += shared_1[k, i] * shared_2[j, k]
+        cuda.syncthreads()
         out[i * size + j] = temp
     # raise NotImplementedError("Need to implement for Task 3.3")
 
@@ -504,9 +505,8 @@ def _tensor_matrix_multiply(
         cuda.syncthreads()
 
         # Compute partial product for the tile
-        if i < out_shape[-2] and j < out_shape[-1]:
-            for k in range(BLOCK_DIM):
-                out_value += a_shared[pi, k] * b_shared[k, pj]
+        for k in range(BLOCK_DIM):
+            out_value += a_shared[pi, k] * b_shared[k, pj]
 
         # Synchronize again before loading the next tile
         cuda.syncthreads()
