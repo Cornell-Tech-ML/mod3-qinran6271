@@ -346,14 +346,15 @@ def tensor_reduce(
              cache[pos] = a_storage[index_to_position(out_index, a_strides)]
         else:
             cache[pos] = reduce_value
-
+        cuda.syncthreads()
+        
         stride = BLOCK_DIM // 2
         while stride > 0:
             if pos < stride:
                 cache[pos] = fn(cache[pos], cache[pos + stride])
             cuda.syncthreads() 
             stride //= 2
-        cuda.syncthreads()
+        
         if pos == 0:
             out[o] = cache[0]
         # raise NotImplementedError("Need to implement for Task 3.3")
