@@ -483,36 +483,35 @@ def _tensor_matrix_multiply(
     # TODO: Implement for Task 3.4.
     assert a_shape[-1] == b_shape[-2]
 
-    # Initialize the output value
-    out_value = 0.0
     
-    # Iterate over all tiles
+    out_value = 0.0
+
+    # Loop over the tiles
     for tile in range((a_shape[-1] + BLOCK_DIM - 1) // BLOCK_DIM):
-        # Load a tile of matrix A into shared memory
-        if i < a_shape[-2] and (tile * BLOCK_DIM + pj) < a_shape[-1]:
-            a_shared[pi, pj] = a_storage[batch * a_batch_stride + i * a_strides[1] + (tile * BLOCK_DIM + pj)]
+        # Load tiles into shared memory
+        if i < a_shape[-2] and tile * BLOCK_DIM + pj < a_shape[-1]:
+            a_shared[pi, pj] = a_storage[i * a_strides[1] + tile * BLOCK_DIM + pj]
         else:
             a_shared[pi, pj] = 0.0
 
-        # Load a tile of matrix B into shared memory
-        if j < b_shape[-1] and (tile * BLOCK_DIM + pi) < b_shape[-2]:
-            b_shared[pi, pj] = b_storage[batch * b_batch_stride + (tile * BLOCK_DIM + pi) * b_strides[1] + j]
+        if tile * BLOCK_DIM + pi < b_shape[-2] and j < b_shape[-1]:
+            b_shared[pi, pj] = b_storage[(tile * BLOCK_DIM + pi) * b_strides[1] + j]
         else:
             b_shared[pi, pj] = 0.0
 
-        # Synchronize to ensure all threads have loaded their data into shared memory
+        # Synchronize to ensure all tiles are loaded
         cuda.syncthreads()
 
-        # Compute partial product for the tile
+        # Multiply the two matrices
         for k in range(BLOCK_DIM):
             out_value += a_shared[pi, k] * b_shared[k, pj]
 
-        # Synchronize again before loading the next tile
+        # Synchronize before loading the next tile
         cuda.syncthreads()
 
     # Write the result to global memory
     if i < out_shape[-2] and j < out_shape[-1]:
-        out[batch * out_strides[0] + i * out_strides[1] + j] = out_value
+        out[i * out_strides[1] + j] = out_value
     # raise NotImplementedError("Need to implement for Task 3.4")
 
 
