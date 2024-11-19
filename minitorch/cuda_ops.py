@@ -403,7 +403,7 @@ def _mm_practice(out: Storage, a: Storage, b: Storage, size: int) -> None:
     ty = cuda.threadIdx.y
     for k in range((size + BLOCK_DIM - 1) // BLOCK_DIM):
         if i < size and (k * BLOCK_DIM + ty) < size:
-            shared_1[i, k] = a[i * size + k * (k * BLOCK_DIM + ty)]
+            shared_1[i, k] = a[i * size + (k * BLOCK_DIM + ty)]
         else:
             shared_1[i, k] = 0.0
         if (k * BLOCK_DIM + tx) < size and j < size:
