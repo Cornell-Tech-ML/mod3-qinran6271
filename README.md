@@ -310,56 +310,116 @@ Parallel structure is already optimal.
 ---------------------------Loop invariant code motion---------------------------
 Allocation hoisting:
 No allocation hoisting found
-None```
-```!cd $DIR && PYTHONPATH=/content/$DIR python3.12 project/run_fast_tensor.py --BACKEND cpu --HIDDEN 100 --DATASET split --RATE 0.05
+None
 ```
-```Epoch  0  loss  6.4968888464704735 correct 36 time per epoch 24.144663333892822
-Epoch  10  loss  3.9578409459282784 correct 38 time per epoch 0.9791371822357178
-Epoch  20  loss  4.679231531783756 correct 45 time per epoch 0.9093866348266602
-Epoch  30  loss  2.533831123665224 correct 40 time per epoch 0.9338433742523193
-Epoch  40  loss  3.370185502995285 correct 46 time per epoch 1.4380383491516113
-Epoch  50  loss  3.418897575982477 correct 45 time per epoch 0.9135429859161377
-Epoch  60  loss  2.2016947390878348 correct 48 time per epoch 0.9403231143951416
-Epoch  70  loss  2.8747559385576658 correct 48 time per epoch 0.9452097415924072
-Epoch  80  loss  1.9113285166076417 correct 48 time per epoch 0.9434607028961182
-Epoch  90  loss  3.1300700139547724 correct 48 time per epoch 0.9334080219268799
-Epoch  100  loss  1.207114035020312 correct 48 time per epoch 0.9140996932983398
-Epoch  110  loss  1.9806607219327277 correct 49 time per epoch 1.480525255203247
-Epoch  120  loss  1.2213321864305187 correct 48 time per epoch 0.9121599197387695
-Epoch  130  loss  0.8221558875794364 correct 48 time per epoch 0.9173905849456787
-Epoch  140  loss  3.2082374479454687 correct 50 time per epoch 1.228849172592163
-Epoch  150  loss  2.330796540192317 correct 48 time per epoch 0.9231059551239014
-Epoch  160  loss  0.7301903505671454 correct 48 time per epoch 0.9355053901672363
-Epoch  170  loss  0.17809215066991088 correct 49 time per epoch 0.9608933925628662
-Epoch  180  loss  1.107191216184606 correct 49 time per epoch 1.3284339904785156
-Epoch  190  loss  1.4522752446561809 correct 50 time per epoch 1.0004668235778809
-Epoch  200  loss  2.8305166127836854 correct 50 time per epoch 0.9976966381072998
-Epoch  210  loss  0.3936421168271946 correct 48 time per epoch 0.9774825572967529
-Epoch  220  loss  0.43468324009249365 correct 49 time per epoch 1.757211685180664
-Epoch  230  loss  1.3651859154072148 correct 48 time per epoch 0.9911048412322998
-Epoch  240  loss  0.663207283857236 correct 49 time per epoch 1.0275843143463135
-Epoch  250  loss  0.5222191999306071 correct 48 time per epoch 1.0559890270233154
-Epoch  260  loss  0.5024639062846329 correct 50 time per epoch 1.3073523044586182
-Epoch  270  loss  1.6029907858346635 correct 48 time per epoch 0.9902005195617676
-Epoch  280  loss  0.7305996732546078 correct 50 time per epoch 0.9909260272979736
-Epoch  290  loss  0.4139446694576468 correct 49 time per epoch 0.9816999435424805
-Epoch  300  loss  0.6080005465995468 correct 49 time per epoch 1.022411584854126
-Epoch  310  loss  0.3362258451054042 correct 49 time per epoch 1.5687050819396973
-Epoch  320  loss  0.14184513148773703 correct 50 time per epoch 0.9895312786102295
-Epoch  330  loss  0.9439022942731701 correct 49 time per epoch 0.9714310169219971
-Epoch  340  loss  0.6161865596032075 correct 49 time per epoch 1.0730631351470947
-Epoch  350  loss  0.9655329935660806 correct 49 time per epoch 1.606121301651001
-Epoch  360  loss  2.0436519618772886 correct 49 time per epoch 1.0233376026153564
-Epoch  370  loss  0.5702782289754218 correct 50 time per epoch 1.0463120937347412
-Epoch  380  loss  0.17781147479647794 correct 49 time per epoch 1.0227060317993164
-Epoch  390  loss  2.1852808058823614 correct 49 time per epoch 1.0293357372283936
-Epoch  400  loss  0.24148062174387291 correct 50 time per epoch 1.3931610584259033
-Epoch  410  loss  1.0569607578771532 correct 49 time per epoch 1.027207851409912
-Epoch  420  loss  0.45968000663288305 correct 49 time per epoch 1.0328338146209717
-Epoch  430  loss  0.727441667945834 correct 50 time per epoch 0.9941041469573975
-Epoch  440  loss  1.7136714825713428 correct 50 time per epoch 1.8374199867248535
-Epoch  450  loss  1.056346736968349 correct 50 time per epoch 1.031541109085083
-Epoch  460  loss  0.12896124422291394 correct 49 time per epoch 1.0312836170196533
-Epoch  470  loss  0.5917835124482559 correct 49 time per epoch 0.9789412021636963
-Epoch  480  loss  1.086330054164532 correct 50 time per epoch 1.1061632633209229
-Epoch  490  loss  0.6031218030801195 correct 49 time per epoch 1.036116600036621```
+Training Result
+```
+!cd $DIR && PYTHONPATH=/content/$DIR python3.12 project/run_fast_tensor.py --BACKEND cpu --HIDDEN 100 --DATASET split --RATE 0.05
+```
+```
+Epoch  0  loss  6.329380556744396 correct 32 time per epoch 33.36060833930969
+Epoch  10  loss  6.428946891384086 correct 34 time per epoch 1.1517863273620605
+Epoch  20  loss  7.562574780955919 correct 35 time per epoch 1.140355110168457
+Epoch  30  loss  3.931688001519477 correct 49 time per epoch 1.1436259746551514
+Epoch  40  loss  3.5463455375286044 correct 49 time per epoch 1.132793664932251
+Epoch  50  loss  2.356076034888201 correct 50 time per epoch 1.1409289836883545
+Epoch  60  loss  2.52195721232775 correct 50 time per epoch 1.8328328132629395
+Epoch  70  loss  2.0129050154614117 correct 50 time per epoch 1.306873083114624
+Epoch  80  loss  1.362608633116857 correct 50 time per epoch 1.1439604759216309
+Epoch  90  loss  1.8323825079997849 correct 48 time per epoch 1.1459977626800537
+Epoch  100  loss  2.555494216200091 correct 49 time per epoch 1.1352922916412354
+Epoch  110  loss  0.8235241917061967 correct 50 time per epoch 1.1651153564453125
+Epoch  120  loss  0.9058017158579026 correct 50 time per epoch 1.1423373222351074
+Epoch  130  loss  1.238432500420562 correct 50 time per epoch 1.1496295928955078
+Epoch  140  loss  0.7834865556249283 correct 50 time per epoch 2.0397629737854004
+Epoch  150  loss  0.7799926004010437 correct 50 time per epoch 1.1495492458343506
+Epoch  160  loss  0.7007451712070379 correct 50 time per epoch 1.1572186946868896
+Epoch  170  loss  0.7454541421957442 correct 49 time per epoch 1.1441543102264404
+Epoch  180  loss  0.4533742679188853 correct 50 time per epoch 1.135951280593872
+Epoch  190  loss  0.5332107073261528 correct 50 time per epoch 1.1635246276855469
+Epoch  200  loss  0.2798371952807319 correct 50 time per epoch 1.2976679801940918
+Epoch  210  loss  1.0488195889370595 correct 50 time per epoch 1.8361246585845947
+Epoch  220  loss  0.3207126464941067 correct 50 time per epoch 1.1420314311981201
+Epoch  230  loss  0.24622832614700094 correct 50 time per epoch 1.1365587711334229
+Epoch  240  loss  0.5914157838161022 correct 50 time per epoch 1.159560203552246
+Epoch  250  loss  0.11849739382688469 correct 50 time per epoch 1.1422479152679443
+Epoch  260  loss  0.670686363317095 correct 50 time per epoch 1.15480637550354
+Epoch  270  loss  0.6397027925628902 correct 50 time per epoch 1.5931353569030762
+Epoch  280  loss  0.14275238353170763 correct 50 time per epoch 1.7088649272918701
+Epoch  290  loss  0.4445675038876047 correct 50 time per epoch 1.1428146362304688
+Epoch  300  loss  0.35230984899525575 correct 50 time per epoch 1.1370790004730225
+Epoch  310  loss  0.1473011178814325 correct 50 time per epoch 1.1463792324066162
+Epoch  320  loss  0.1079058693879855 correct 50 time per epoch 1.139085292816162
+Epoch  330  loss  0.02048697962613371 correct 50 time per epoch 1.1401588916778564
+Epoch  340  loss  0.23431597986258693 correct 50 time per epoch 1.6330485343933105
+Epoch  350  loss  0.10887621176770493 correct 50 time per epoch 2.2935988903045654
+Epoch  360  loss  0.447113435320587 correct 50 time per epoch 1.1371757984161377
+Epoch  370  loss  0.14203008788964 correct 50 time per epoch 1.1411681175231934
+Epoch  380  loss  0.32486859928315753 correct 50 time per epoch 1.1715002059936523
+Epoch  390  loss  0.07994892870557352 correct 50 time per epoch 1.1511461734771729
+Epoch  400  loss  0.030964691452754968 correct 50 time per epoch 1.1501805782318115
+Epoch  410  loss  0.10012777257017401 correct 50 time per epoch 1.7415132522583008
+Epoch  420  loss  0.14436568400740973 correct 50 time per epoch 1.573392391204834
+Epoch  430  loss  0.25200445914814434 correct 50 time per epoch 1.1445648670196533
+Epoch  440  loss  0.032494372302225835 correct 50 time per epoch 1.1556003093719482
+Epoch  450  loss  0.08271994830560588 correct 50 time per epoch 1.1333134174346924
+Epoch  460  loss  0.049489076064449224 correct 50 time per epoch 1.1379351615905762
+Epoch  470  loss  0.08828561568200574 correct 50 time per epoch 1.1422865390777588
+Epoch  480  loss  0.022156173654027854 correct 50 time per epoch 1.7827162742614746
+Epoch  490  loss  0.20661983042631135 correct 50 time per epoch 1.4101402759552002
+```
+```
+python run_fast_tensor.py --BACKEND cpu --HIDDEN 100 --DATASET split --RATE 0.05
+```
+```
+Epoch  0  loss  8.838360797088917 correct 38 time per epoch 4.7541725635528564
+Epoch  10  loss  4.092803078955783 correct 39 time per epoch 2.6414217948913574
+Epoch  20  loss  3.849158967707628 correct 49 time per epoch 1.9597704410552979
+Epoch  30  loss  2.3058475341408258 correct 45 time per epoch 1.9619815349578857
+Epoch  40  loss  2.466399902154435 correct 46 time per epoch 2.7527406215667725
+Epoch  50  loss  1.689306402217929 correct 50 time per epoch 1.9408400058746338
+Epoch  60  loss  1.952860668240406 correct 46 time per epoch 2.0255486965179443
+Epoch  70  loss  1.5081560687421596 correct 50 time per epoch 2.6275346279144287
+Epoch  80  loss  1.0607719130865405 correct 50 time per epoch 1.9796392917633057
+Epoch  90  loss  1.0410480030259246 correct 50 time per epoch 2.0627570152282715
+Epoch  100  loss  0.48912075438456876 correct 50 time per epoch 2.776263475418091
+Epoch  110  loss  0.6515518038095105 correct 50 time per epoch 2.62679386138916
+Epoch  120  loss  1.00594056971935 correct 50 time per epoch 1.978724479675293
+Epoch  130  loss  1.0942554393077706 correct 50 time per epoch 2.332735776901245
+Epoch  140  loss  0.4663971650609539 correct 50 time per epoch 2.0292937755584717
+Epoch  150  loss  0.8282750243882028 correct 50 time per epoch 1.9649648666381836
+Epoch  160  loss  0.6706867142608739 correct 50 time per epoch 2.240196466445923
+Epoch  170  loss  0.4340160340193874 correct 50 time per epoch 1.9701557159423828
+Epoch  180  loss  0.5078020753823934 correct 50 time per epoch 2.012385129928589
+Epoch  190  loss  0.38466929858387194 correct 50 time per epoch 2.3851871490478516
+Epoch  200  loss  0.24677094030376406 correct 50 time per epoch 1.9531254768371582
+Epoch  210  loss  0.35362602637914287 correct 50 time per epoch 1.9616243839263916
+Epoch  220  loss  0.21003361041103247 correct 50 time per epoch 2.3877813816070557
+Epoch  230  loss  0.5887457919628153 correct 50 time per epoch 2.021068811416626
+Epoch  240  loss  0.6593639809732923 correct 50 time per epoch 1.9595880508422852
+Epoch  250  loss  0.7081668409921991 correct 50 time per epoch 2.7588412761688232
+Epoch  260  loss  0.26552814189792606 correct 50 time per epoch 1.9546887874603271
+Epoch  270  loss  0.35730925535791846 correct 50 time per epoch 1.9604809284210205
+Epoch  280  loss  0.15242408575452954 correct 50 time per epoch 2.8294854164123535
+Epoch  290  loss  0.23893001453125468 correct 50 time per epoch 1.9736242294311523
+Epoch  300  loss  0.19122161558643383 correct 50 time per epoch 1.9641797542572021
+Epoch  310  loss  0.0704185366385677 correct 50 time per epoch 2.783759355545044
+Epoch  320  loss  0.1701445034965377 correct 50 time per epoch 2.0212743282318115
+Epoch  330  loss  0.1309914564057976 correct 50 time per epoch 2.0356030464172363
+Epoch  340  loss  0.31146387691897837 correct 50 time per epoch 3.1662063598632812
+Epoch  350  loss  0.32992285513216646 correct 50 time per epoch 1.9661445617675781
+Epoch  360  loss  0.23387657785174545 correct 50 time per epoch 1.9599435329437256
+Epoch  370  loss  0.22988542049228558 correct 50 time per epoch 2.446458101272583
+Epoch  380  loss  0.19275063617624735 correct 50 time per epoch 2.016336441040039
+Epoch  390  loss  0.3443280315452528 correct 50 time per epoch 1.9586005210876465
+Epoch  400  loss  0.13984485172738298 correct 50 time per epoch 2.2222769260406494
+Epoch  410  loss  0.11156510057699474 correct 50 time per epoch 1.9660415649414062
+Epoch  420  loss  0.01600530102113003 correct 50 time per epoch 2.0056824684143066
+Epoch  430  loss  0.13800487950685197 correct 50 time per epoch 2.1158697605133057
+Epoch  440  loss  0.08544419645006626 correct 50 time per epoch 1.9452672004699707
+Epoch  450  loss  0.18350165515950667 correct 50 time per epoch 1.9611608982086182
+Epoch  460  loss  0.11411525195655844 correct 50 time per epoch 1.9615213871002197
+Epoch  470  loss  0.07539741377254147 correct 50 time per epoch 2.0832715034484863
+Epoch  480  loss  0.1524078592745861 correct 50 time per epoch 2.400529623031616
+Epoch  490  loss  0.08165000781701359 correct 50 time per epoch 1.9694602489471436
+```
