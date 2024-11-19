@@ -128,6 +128,7 @@ def test_reduce(
     name, _, tensor_fn = fn
     grad_check(tensor_fn, t1)
 
+
 print("CUDA available:", numba.cuda.is_available())
 if numba.cuda.is_available():
 

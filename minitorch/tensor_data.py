@@ -156,7 +156,6 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
                 raise IndexingError(f"Broadcast failure {a} {b}")
     return tuple(reversed(c_rev))
 
-        
     # raise NotImplementedError("Need to implement for Task 2.2")
 
 

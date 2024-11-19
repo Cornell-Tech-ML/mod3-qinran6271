@@ -108,7 +108,7 @@ class FastTrain:
                 correct = int(((out.detach() > 0.5) == y2).sum()[0])
                 time_diff = time() - start
                 log_fn(epoch, total_loss, correct, losses, time_diff)
-            
+
 
 
 if __name__ == "__main__":

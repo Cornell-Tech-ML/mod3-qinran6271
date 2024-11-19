@@ -135,8 +135,8 @@ class Mul(Function):
         """Multiply backward"""
         t1, t2 = ctx.saved_values
         return (
-            grad_output.f.mul_zip(t2, grad_output), 
-            grad_output.f.mul_zip(t1, grad_output)
+            grad_output.f.mul_zip(t2, grad_output),
+            grad_output.f.mul_zip(t1, grad_output),
         )
 
 
@@ -228,6 +228,7 @@ class LT(Function):
         a_shape, b_shape = ctx.saved_values
         return zeros(a_shape), zeros(b_shape)
 
+
 class EQ(Function):
     @staticmethod
     def forward(ctx: Context, a: Tensor, b: Tensor) -> Tensor:
@@ -240,6 +241,7 @@ class EQ(Function):
         """Equal"""
         a_shape, b_shape = ctx.saved_values
         return zeros(a_shape), zeros(b_shape)
+
 
 class IsClose(Function):
     @staticmethod

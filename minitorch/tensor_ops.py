@@ -14,7 +14,6 @@ from .tensor_data import (
 
 # add imports
 from numpy import array
-import numpy as np
 #
 
 if TYPE_CHECKING:
@@ -277,7 +276,7 @@ def tensor_map(
         in_strides: Strides,
     ) -> None:
         # TODO: Implement for Task 2.3.
-         # initialize index
+        # initialize index
         out_index: Index = array(out_shape)
         in_index: Index = array(in_shape)
         for i in range(len(out)):
@@ -400,6 +399,7 @@ def tensor_reduce(
                 j = index_to_position(out_index, a_strides)
                 # apply fn to out[o] and a_storage[a] and store in out[o]
                 out[o] = fn(out[o], a_storage[j])
+
     return _reduce
 
 

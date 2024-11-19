@@ -29,11 +29,13 @@ FakeCUDAKernel = Any
 Fn = TypeVar("Fn")
 
 
-def device_jit(fn: Fn, **kwargs) -> Fn:
+def device_jit(fn: Fn, **kwargs: Any) -> Fn:
+    """A decorator like jit, but compiles for the GPU."""
     return _jit(device=True, **kwargs)(fn)  # type: ignore
 
 
-def jit(fn, **kwargs) -> FakeCUDAKernel:
+def jit(fn: Fn, **kwargs: Any) -> FakeCUDAKernel:
+    """A decorator like jit, but compiles for the GPU."""
     return _jit(**kwargs)(fn)  # type: ignore
 
 
@@ -67,6 +69,7 @@ class CudaOps(TensorOps):
 
     @staticmethod
     def zip(fn: Callable[[float, float], float]) -> Callable[[Tensor, Tensor], Tensor]:
+        """Applies the function fn element-wise to two Tensor objects."""
         cufn: Callable[[float, float], float] = device_jit(fn)
         f = tensor_zip(cufn)
 
@@ -86,6 +89,7 @@ class CudaOps(TensorOps):
     def reduce(
         fn: Callable[[float, float], float], start: float = 0.0
     ) -> Callable[[Tensor, int], Tensor]:
+        """Reduce a tensor along a dimension."""
         cufn: Callable[[float, float], float] = device_jit(fn)
         f = tensor_reduce(cufn)
 
@@ -106,6 +110,7 @@ class CudaOps(TensorOps):
 
     @staticmethod
     def matrix_multiply(a: Tensor, b: Tensor) -> Tensor:
+        """Matrix multiply"""
         # Make these always be a 3 dimensional multiply
         both_2d = 0
         if len(a.shape) == 2:
@@ -176,14 +181,14 @@ def tensor_map(
         # TODO: Implement for Task 3.3.
 
         # Check if the thread index is within bounds
-        if i < out_size:        
+        if i < out_size:
             to_index(i, out_shape, out_index)
             broadcast_index(out_index, out_shape, in_shape, in_index)
             o = index_to_position(out_index, out_strides)
             j = index_to_position(in_index, in_strides)
             out[o] = fn(in_storage[j])
         # raise NotImplementedError("Need to implement for Task 3.3")
-            
+
     return cuda.jit()(_map)  # type: ignore
 
 
@@ -241,8 +246,8 @@ def tensor_zip(
 def _sum_practice(out: Storage, a: Storage, size: int) -> None:
     """Practice kernel for summing elements in preparation for reduction.
 
-    Given an array `a` of length `n` and an output array `out` of size 
-    `n // blockDIM`, this function sums every `blockDIM` values in `a` 
+    Given an array `a` of length `n` and an output array `out` of size
+    `n // blockDIM`, this function sums every `blockDIM` values in `a`
     and stores the result into `out`.
 
     Example:
@@ -261,7 +266,7 @@ def _sum_practice(out: Storage, a: Storage, size: int) -> None:
         out (Storage): The storage for the output tensor.
         a (Storage): The storage for the input tensor.
         size (int): The length of the input tensor `a`.
-        
+
     """
     BLOCK_DIM = 32
 
@@ -340,10 +345,10 @@ def tensor_reduce(
         reduce_size = a_shape[reduce_dim]
         to_index(out_pos, out_shape, out_index)
         o = index_to_position(out_index, out_strides)
-        
+
         if pos < reduce_size:
-             out_index[reduce_dim] = pos
-             cache[pos] = a_storage[index_to_position(out_index, a_strides)]
+            out_index[reduce_dim] = pos
+            cache[pos] = a_storage[index_to_position(out_index, a_strides)]
         else:
             cache[pos] = reduce_value
         cuda.syncthreads()
@@ -352,9 +357,9 @@ def tensor_reduce(
         while stride > 0:
             if pos < stride:
                 cache[pos] = fn(cache[pos], cache[pos + stride])
-            cuda.syncthreads() 
+            cuda.syncthreads()
             stride //= 2
-        
+
         if pos == 0:
             out[o] = cache[0]
         # raise NotImplementedError("Need to implement for Task 3.3")
@@ -407,14 +412,17 @@ def _mm_practice(out: Storage, a: Storage, b: Storage, size: int) -> None:
     temp = 0.0
 
     for block_idx in range((size + BLOCK_DIM - 1) // BLOCK_DIM):
-
         if row < size and (block_idx * BLOCK_DIM + local_col) < size:
-            shared_a[local_row, local_col] = a[row * size + block_idx * BLOCK_DIM + local_col]
+            shared_a[local_row, local_col] = a[
+                row * size + block_idx * BLOCK_DIM + local_col
+            ]
         else:
             shared_a[local_row, local_col] = 0.0
 
         if col < size and (block_idx * BLOCK_DIM + local_row) < size:
-            shared_b[local_row, local_col] = b[(block_idx * BLOCK_DIM + local_row) * size + col]
+            shared_b[local_row, local_col] = b[
+                (block_idx * BLOCK_DIM + local_row) * size + col
+            ]
         else:
             shared_b[local_row, local_col] = 0.0
 
@@ -429,10 +437,12 @@ def _mm_practice(out: Storage, a: Storage, b: Storage, size: int) -> None:
         out[row * size + col] = temp
     # raise NotImplementedError("Need to implement for Task 3.3")
 
+
 jit_mm_practice = jit(_mm_practice)
 
 
 def mm_practice(a: Tensor, b: Tensor) -> TensorData:
+    """Matrix multiply practice function."""
     (size, _) = a.shape
     threadsperblock = (THREADS_PER_BLOCK, THREADS_PER_BLOCK)
     blockspergrid = 1
@@ -477,7 +487,7 @@ def _tensor_matrix_multiply(
     # Batch dimension - fixed
     batch = cuda.blockIdx.z
 
-    BLOCK_DIM = 32 # 一个block中的线程数
+    BLOCK_DIM = 32  # 一个block中的线程数
     a_shared = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
     b_shared = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
 
@@ -499,18 +509,26 @@ def _tensor_matrix_multiply(
 
     # Initialize the output value
     out_value = 0.0
-    
+
     # Iterate over all tiles
     for block_i in range((a_shape[-1] + BLOCK_DIM - 1) // BLOCK_DIM):
         # Load a tile of matrix A into shared memory
         if i < a_shape[-2] and (block_i * BLOCK_DIM + pj) < a_shape[-1]:
-            a_shared[pi, pj] = a_storage[batch * a_batch_stride + i * a_strides[1] + (block_i * BLOCK_DIM + pj) * a_strides[2] ]
+            a_shared[pi, pj] = a_storage[
+                batch * a_batch_stride
+                + i * a_strides[1]
+                + (block_i * BLOCK_DIM + pj) * a_strides[2]
+            ]
         else:
             a_shared[pi, pj] = 0.0
 
         # Load a tile of matrix B into shared memory
         if j < b_shape[-1] and (block_i * BLOCK_DIM + pi) < b_shape[-2]:
-            b_shared[pi, pj] = b_storage[batch * b_batch_stride + (block_i * BLOCK_DIM + pi) * b_strides[1] + j * b_strides[2]]
+            b_shared[pi, pj] = b_storage[
+                batch * b_batch_stride
+                + (block_i * BLOCK_DIM + pi) * b_strides[1]
+                + j * b_strides[2]
+            ]
         else:
             b_shared[pi, pj] = 0.0
 
@@ -526,7 +544,9 @@ def _tensor_matrix_multiply(
 
     # Write the result to global memory
     if i < out_shape[-2] and j < out_shape[-1]:
-        out[batch * out_strides[0] + i * out_strides[1] + j * out_strides[2]] = out_value
+        out[batch * out_strides[0] + i * out_strides[1] + j * out_strides[2]] = (
+            out_value
+        )
     # raise NotImplementedError("Need to implement for Task 3.4")
 
 
