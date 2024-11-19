@@ -395,30 +395,38 @@ def _mm_practice(out: Storage, a: Storage, b: Storage, size: int) -> None:
     """
     BLOCK_DIM = 32
     # TODO: Implement for Task 3.3.
-    shared_1 = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
-    shared_2 = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
-    i = cuda.blockIdx.x * cuda.blockDim.x + cuda.threadIdx.x
-    j = cuda.blockIdx.y * cuda.blockDim.y + cuda.threadIdx.y
-    tx = cuda.threadIdx.x
-    ty = cuda.threadIdx.y
-    for k in range((size + BLOCK_DIM - 1) // BLOCK_DIM):
-        if i < size and (k * BLOCK_DIM + ty) < size:
-            shared_1[i, k] = a[i * size + (k * BLOCK_DIM + ty)]
+    shared_a = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
+    shared_b = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
+
+    row = cuda.blockIdx.x * cuda.blockDim.x + cuda.threadIdx.x
+    col = cuda.blockIdx.y * cuda.blockDim.y + cuda.threadIdx.y
+
+    local_row = cuda.threadIdx.x
+    local_col = cuda.threadIdx.y
+
+    temp = 0.0
+
+    for block_idx in range((size + BLOCK_DIM - 1) // BLOCK_DIM):
+
+        if row < size and (block_idx * BLOCK_DIM + local_col) < size:
+            shared_a[local_row, local_col] = a[row * size + block_idx * BLOCK_DIM + local_col]
         else:
-            shared_1[i, k] = 0.0
-        if (k * BLOCK_DIM + tx) < size and j < size:
-            shared_2[k, j] = b[(k * BLOCK_DIM + tx) * size + j]
+            shared_a[local_row, local_col] = 0.0
+
+        if col < size and (block_idx * BLOCK_DIM + local_row) < size:
+            shared_b[local_row, local_col] = b[(block_idx * BLOCK_DIM + local_row) * size + col]
         else:
-            shared_2[k, j] = 0.0
+            shared_b[local_row, local_col] = 0.0
 
         cuda.syncthreads()
 
-        temp = 0.0
-        for n in range(BLOCK_DIM):
-            temp += shared_1[n, i] * shared_2[j, n]
+        for k in range(BLOCK_DIM):
+            temp += shared_a[local_row, k] * shared_b[k, local_col]
+
         cuda.syncthreads()
-    if i < size and j < size:
-        out[i * size + j] = temp
+
+    if row < size and col < size:
+        out[row * size + col] = temp
     # raise NotImplementedError("Need to implement for Task 3.3")
 
 jit_mm_practice = jit(_mm_practice)
