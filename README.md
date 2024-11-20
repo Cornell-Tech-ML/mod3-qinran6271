@@ -312,6 +312,36 @@ Allocation hoisting:
 No allocation hoisting found
 None
 ```
+# 3.4 timing
+
+```
+{'fast': np.float64(0.033411900202433266), 'gpu': np.float64(0.024042844772338867)}
+Running size 256
+{'fast': np.float64(0.13466540972391763), 'gpu': np.float64(0.043764750162760414)}
+Running size 512
+{'fast': np.float64(0.9965393543243408), 'gpu': np.float64(0.18561124801635742)}
+Running size 1024
+{'fast': np.float64(7.898449818293254), 'gpu': np.float64(0.867194652557373)}
+
+Timing summary
+Size: 64
+    fast: 0.00764
+    gpu: 0.01092
+Size: 128
+    fast: 0.03341
+    gpu: 0.02404
+Size: 256
+    fast: 0.13467
+    gpu: 0.04376
+Size: 512
+    fast: 0.99654
+    gpu: 0.18561
+Size: 1024
+    fast: 7.89845
+    gpu: 0.86719
+```
+![image](https://github.com/user-attachments/assets/f2d3f337-d54d-4bc6-adfa-911b52a95136)
+
 # 3.5 Training Result
 ## Split
 ```
