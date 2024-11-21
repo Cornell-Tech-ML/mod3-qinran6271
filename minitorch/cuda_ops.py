@@ -516,7 +516,7 @@ def _tensor_matrix_multiply(
                 + (k + pj) * a_strides[2]]
         if j < out_size and k + pi < out_size:
             b_shared[pi, pj] = b_storage[
-                + (k + pi) * b_strides[1]
+                (k + pi) * b_strides[1]
                 + j * b_strides[2]]
         cuda.syncthreads()
 
@@ -525,7 +525,7 @@ def _tensor_matrix_multiply(
             if k + local_k < out_size:
                 out_value += a_shared[pi, local_k] * b_shared[local_k, pj]
     if i < out_size and j < out_size:
-        out[i, j] = out_value
+        out[i * out_strides[1] + j * out_strides[2]] = out_value
 
     # Iterate over all tiles
     # for block_i in range((a_shape[-1] + BLOCK_DIM - 1) // BLOCK_DIM):
