@@ -515,8 +515,9 @@ def _tensor_matrix_multiply(
         if j < out_size and k + pi < out_size:
             b_shared[pi, pj] = b_storage[k + pi, j]
         cuda.syncthreads()
-
-        for local_k in range(BLOCK_DIM):
+        
+        # for local_k in range(BLOCK_DIM):
+        for local_k in range(min(BLOCK_DIM, out_size - k)):
             if k + local_k < out_size:
                 out_value += a_shared[pi, local_k] * b_shared[local_k, pj]
     if i < out_size and j < out_size:
