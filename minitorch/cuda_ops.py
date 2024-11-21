@@ -541,6 +541,12 @@ def _tensor_matrix_multiply(
         # Synchronize again before loading the next tile
         cuda.syncthreads()
 
+    # Write the result to global memory
+    if i < out_shape[-2] and j < out_shape[-1]:
+        out[batch * out_strides[0] + i * out_strides[1] + j * out_strides[2]] = (
+            out_value
+        )
+
     # # Write the result to global memory
     # if i < out_shape[-2] and j < out_shape[-1]:
     #     out[batch * out_strides[0] + i * out_strides[1] + j * out_strides[2]] = (
