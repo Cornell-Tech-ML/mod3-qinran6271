@@ -550,13 +550,13 @@ def _tensor_matrix_multiply(
     for k in range(0, out_size, BLOCK_DIM):
         if i < out_size and k + pj < out_size:
             a_shared[pi, pj] = a_storage[
-                batch * a_batch_stride + i * a_strides[1] + (k + pj) * a_strides[2]
+                i * a_strides[0] + (k + pj) * a_strides[1]
             ]
         else:
             a_shared[pi, pj] = 0.0
         if j < out_size and k + pi < out_size:
             b_shared[pi, pj] = b_storage[
-                batch * b_batch_stride + (k + pi) * b_strides[1] + j * b_strides[2]
+                (k + pi) * b_strides[0] + j * b_strides[1]
             ]
         else:
             b_shared[pi, pj] = 0.0
@@ -567,7 +567,7 @@ def _tensor_matrix_multiply(
             if k + local_k < out_size:
                 out_value += a_shared[pi, local_k] * b_shared[local_k, pj]
     if i < out_size and j < out_size:
-        out[batch * out_strides[0] + i * out_strides[1] + j * out_strides[2]] = (
+        out[ i * out_strides[0] + j * out_strides[1]] = (
             out_value
         )
     # raise NotImplementedError("Need to implement for Task 3.4")
