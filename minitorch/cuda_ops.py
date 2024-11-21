@@ -482,10 +482,10 @@ def _tensor_matrix_multiply(
     Returns:
         None : Fills in `out`
     """
-    # a_batch_stride = a_strides[0] if a_shape[0] > 1 else 0
-    # b_batch_stride = b_strides[0] if b_shape[0] > 1 else 0
+    a_batch_stride = a_strides[0] if a_shape[0] > 1 else 0
+    b_batch_stride = b_strides[0] if b_shape[0] > 1 else 0
     # Batch dimension - fixed
-    # batch = cuda.blockIdx.z
+    batch = cuda.blockIdx.z
 
     BLOCK_DIM = 32  # 一个block中的线程数
     a_shared = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
@@ -511,9 +511,14 @@ def _tensor_matrix_multiply(
     out_value = 0.0
     for k in range(0, out_size, BLOCK_DIM):
         if i < out_size and k + pj < out_size:
-            a_shared[pi, pj] = a_storage[i, k + pj]
+            a_shared[pi, pj] = a_storage[
+                batch * a_batch_stride
+                + i * a_strides[1]
+                + (k * BLOCK_DIM + pj) * a_strides[2]]
         if j < out_size and k + pi < out_size:
-            b_shared[pi, pj] = b_storage[k + pi, j]
+            b_shared[pi, pj] = b_storage[batch * b_batch_stride
+                + (k * BLOCK_DIM + pi) * b_strides[1]
+                + j * b_strides[2]]
         cuda.syncthreads()
 
         # for local_k in range(BLOCK_DIM):
