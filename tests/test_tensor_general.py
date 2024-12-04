@@ -129,6 +129,7 @@ def test_reduce(
     grad_check(tensor_fn, t1)
 
 
+print("CUDA available:", numba.cuda.is_available())
 if numba.cuda.is_available():
 
     @pytest.mark.task3_3
@@ -306,7 +307,7 @@ if numba.cuda.is_available():
 
 
 @given(data())
-@settings(max_examples=25)
+@settings(max_examples=26)
 @pytest.mark.parametrize("fn", two_arg)
 @pytest.mark.parametrize("backend", backend_tests)
 def test_two_grad_broadcast(
