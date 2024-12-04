@@ -353,8 +353,8 @@ def _tensor_matrix_multiply(
     # Outer loop over output tensor in parallel
     # Outer loop over output tensor in parallel
     for i in prange(out_shape[0]):  # Assuming batch dimension (or outermost dimension)
-        for j in range(out_shape[1]):  # Iterate over rows of output
-            for k in range(out_shape[2]):  # Iterate over columns of output
+        for j in prange(out_shape[1]):  # Iterate over rows of output
+            for k in prange(out_shape[2]):  # Iterate over columns of output
                 # a_index = i * a_batch_stride + j * a_strides[1] + p * a_strides[2] # 第j行， 第p列
                 a_inner = i * a_batch_stride + j * a_strides[1]
                 # b_index = i * b_batch_stride + p * b_strides[1] + k * b_strides[2] # 第p行， 第k列
