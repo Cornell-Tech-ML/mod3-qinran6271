@@ -50,12 +50,8 @@ class Linear(minitorch.Module):
     def forward(self, x):
         # TODO: Implement for Task 3.5.
         batch, in_size = x.shape
-        return (
-            self.weights.value.view(1, in_size, self.out_size)
-            * x.view(batch, in_size, 1)
-        ).sum(1).view(batch, self.out_size) + self.bias.value.view(self.out_size)
+        return x.view(batch, in_size) @ self.weights.value + self.bias.value
         # raise NotImplementedError("Need to implement for Task 3.5")
-
 
 class FastTrain:
     def __init__(self, hidden_layers, backend=FastTensorBackend):
